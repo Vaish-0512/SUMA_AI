@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Account & Rides | RideConnect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo">
+        <i class="fa-solid fa-car-side"></i>
+        <span>RideConnect</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Find a Ride</a></li>
+        <li><a href="profile.html" class="nav-link active">Dashboard</a></li>
+      </ul>
+
+      <div class="nav-auth" id="nav-auth-container">
+        <!-- Injected dynamically -->
+      </div>
+    </div>
+  </nav>
+
+  <!-- Profile & Dashboard Container -->
+  <main class="container" style="padding-top: 2.5rem; padding-bottom: 5rem;">
+    <!-- User Quick Header Card -->
+    <div style="background: white; border-radius: var(--radius-lg); padding: 2rem; border: 1px solid var(--border); box-shadow: var(--shadow-sm); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; align-items: center; gap: 1.25rem;">
+        <div id="user-header-avatar" class="avatar-circle" style="width: 64px; height: 64px; font-size: 1.75rem; box-shadow: 0 4px 10px rgba(29, 78, 216, 0.2);">U</div>
+        <div>
+          <h2 id="user-header-name" style="font-size: 1.6rem; font-weight: 700; color: var(--text-main);">User Profile</h2>
+          <p id="user-header-email" style="color: var(--text-muted); font-size: 0.95rem;">Loading account details...</p>
+        </div>
+      </div>
+      <div>
+        <a href="index.html" class="btn btn-primary btn-sm">
+          <i class="fa-solid fa-magnifying-glass"></i> Explore More Rides
+        </a>
+      </div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="tabs-nav">
+      <button class="tab-btn active" onclick="switchTab('posted-rides')">
+        <i class="fa-solid fa-car"></i> Rides Offered (<span id="posted-count">0</span>)
+      </button>
+      <button class="tab-btn" onclick="switchTab('booked-rides')">
+        <i class="fa-solid fa-ticket"></i> Booked Seats (<span id="booked-count">0</span>)
+      </button>
+      <button class="tab-btn" onclick="switchTab('edit-profile')">
+        <i class="fa-solid fa-user-pen"></i> Edit Profile
+      </button>
+    </div>
+
+    <!-- Tab 1: Posted Rides -->
+    <div id="tab-posted-rides" class="tab-pane">
+      <div id="posted-rides-list" class="rides-grid">
+        <p style="color: var(--text-muted);">Loading rides...</p>
+      </div>
+    </div>
+
+    <!-- Tab 2: Booked Rides -->
+    <div id="tab-booked-rides" class="tab-pane" style="display: none;">
+      <div id="booked-rides-list" class="rides-grid">
+        <p style="color: var(--text-muted);">Loading reservations...</p>
+      </div>
+    </div>
+
+    <!-- Tab 3: Edit Profile -->
+    <div id="tab-edit-profile" class="tab-pane" style="display: none;">
+      <div style="max-width: 550px; background: white; padding: 2rem; border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+        <h3 style="font-size: 1.25rem; margin-bottom: 1.25rem; color: var(--text-main);">Update Personal Details</h3>
+        <form id="profile-form">
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label for="profile-name"><i class="fa-regular fa-user"></i> Full Name</label>
+            <input type="text" id="profile-name" class="form-control no-icon" required>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label for="profile-email"><i class="fa-regular fa-envelope"></i> Email Address</label>
+            <input type="email" id="profile-email" class="form-control no-icon" disabled style="background: var(--bg-main); color: var(--text-muted);">
+            <small style="color: var(--text-light); margin-top: 4px;">Email cannot be changed directly.</small>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label for="profile-phone"><i class="fa-solid fa-phone"></i> Phone Number</label>
+            <input type="tel" id="profile-phone" class="form-control no-icon" placeholder="+1 (555) 000-0000">
+          </div>
+
+          <button type="submit" id="save-profile-btn" class="btn btn-primary">
+            <i class="fa-solid fa-floppy-disk"></i> Save Profile
+          </button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="brand-logo" style="font-size: 1.25rem;">
+        <i class="fa-solid fa-car-side"></i>
+        <span>RideConnect</span>
+      </div>
+      <div>
+        <span>Cloud-Connected Ride Sharing Platform</span>
+      </div>
+    </div>
+    <div class="container footer-copy">
+      &copy; 2026 RideConnect. All rights reserved.
+    </div>
+  </footer>
+
+  <!-- Firebase Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <!-- App Scripts -->
+  <script src="js/firebase-config.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    let activeUser = null;
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(pane => pane.style.display = 'none');
+
+      const targetPane = document.getElementById('tab-' + tabName);
+      if (targetPane) targetPane.style.display = 'block';
+
+      // Mark clicked button active
+      const buttons = document.querySelectorAll('.tab-btn');
+      if (tabName === 'posted-rides') buttons[0].classList.add('active');
+      else if (tabName === 'booked-rides') buttons[1].classList.add('active');
+      else if (tabName === 'edit-profile') buttons[2].classList.add('active');
+    }
+
+    async function initProfile() {
+      await window.updateNavAuth();
+      activeUser = await window.RideConnect.getCurrentUser();
+
+      if (!activeUser) {
+        window.showToast("Please log in to view your dashboard.", "info");
+        setTimeout(() => window.location.href = 'login.html', 700);
+        return;
+      }
+
+      // Populate Header & Profile Form
+      const name = activeUser.name || activeUser.email.split('@')[0];
+      document.getElementById('user-header-avatar').textContent = name[0].toUpperCase();
+      document.getElementById('user-header-name').textContent = name;
+      document.getElementById('user-header-email').textContent = activeUser.email;
+
+      document.getElementById('profile-name').value = name;
+      document.getElementById('profile-email').value = activeUser.email;
+      document.getElementById('profile-phone').value = activeUser.phone || '';
+
+      // Load posted rides
+      loadPostedRides();
+      // Load booked rides
+      loadBookedRides();
+    }
+
+    async function loadPostedRides() {
+      const container = document.getElementById('posted-rides-list');
+      try {
+        const rides = await window.RideConnect.getUserPostedRides(activeUser.uid);
+        document.getElementById('posted-count').textContent = rides.length;
+
+        if (rides.length === 0) {
+          container.innerHTML = `
+            <div style="grid-column: 1/-1; background: white; padding: 3rem; text-align: center; border-radius: var(--radius-lg); border: 1px dashed var(--border);">
+              <i class="fa-solid fa-car" style="font-size: 2.5rem; color: var(--text-light); margin-bottom: 0.8rem;"></i>
+              <h4 style="font-size: 1.15rem;">You haven't posted any rides yet</h4>
+              <p style="color: var(--text-muted); margin-bottom: 1rem;">Heading out somewhere? Share your empty seats to split costs.</p>
+              <a href="index.html" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus-circle"></i> Offer a Ride</a>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = rides.map(ride => `
+          <div class="ride-card">
+            <div>
+              <div class="ride-header">
+                <span class="seat-tag available"><i class="fa-solid fa-bullhorn"></i> Offered by you</span>
+                <div class="ride-price-badge">
+                  <span class="amount">₹${ride.price}</span>
+                  <span class="unit">per seat</span>
+                </div>
+              </div>
+
+              <div class="route-container">
+                <div class="route-stop">
+                  <div class="route-stop-title">Origin</div>
+                  <div class="route-stop-city">${ride.fromCity || ride.origin || '—'}</div>
+                </div>
+                <div class="route-stop destination">
+                  <div class="route-stop-title">Destination</div>
+                  <div class="route-stop-city">${ride.toCity || ride.destination || '—'}</div>
+                </div>
+              </div>
+
+              <div class="ride-meta-grid">
+                <div class="meta-item"><i class="fa-regular fa-calendar"></i><span>${ride.date}</span></div>
+                <div class="meta-item"><i class="fa-regular fa-clock"></i><span>${ride.time}</span></div>
+                ${ride.car ? `<div class="meta-item"><i class="fa-solid fa-car"></i><span>${ride.car}</span></div>` : ''}
+                ${ride.vehicleType ? `<div class="meta-item"><i class="fa-solid fa-tag"></i><span style="background:var(--primary-light);color:var(--primary);padding:1px 8px;border-radius:20px;font-size:0.78rem;font-weight:600;">${ride.vehicleType}</span></div>` : ''}
+              </div>
+
+              ${ride.notes ? `<p style="font-size:0.82rem;color:var(--text-muted);font-style:italic;margin-bottom:0.75rem;"><i class="fa-solid fa-quote-left"></i> ${ride.notes}</p>` : ''}
+            </div>
+
+            <div style="border-top: 1px solid var(--border); padding-top: 0.75rem;">
+              <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.9rem; margin-bottom:0.5rem;">
+                <span style="font-weight:600;color:var(--primary);">
+                  <i class="fa-solid fa-chair"></i> ${ride.seatsAvailable ?? ride.seats ?? 0} of ${ride.seatsTotal ?? ride.seats ?? 0} seats free
+                </span>
+                <span class="seat-tag ${(ride.seatsAvailable ?? 1) > 0 ? 'available' : 'full'}">
+                  ${(ride.seatsAvailable ?? 1) > 0 ? 'Active' : 'Fully Booked'}
+                </span>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        container.innerHTML = `<p style="color: var(--danger);">Failed to load your rides: ${err.message}</p>`;
+      }
+    }
+
+    async function loadBookedRides() {
+      const container = document.getElementById('booked-rides-list');
+      try {
+        const bookings = await window.RideConnect.getUserBookings(activeUser.uid);
+        document.getElementById('booked-count').textContent = bookings.length;
+
+        if (bookings.length === 0) {
+          container.innerHTML = `
+            <div style="grid-column: 1/-1; background: white; padding: 3rem; text-align: center; border-radius: var(--radius-lg); border: 1px dashed var(--border);">
+              <i class="fa-solid fa-ticket" style="font-size: 2.5rem; color: var(--text-light); margin-bottom: 0.8rem;"></i>
+              <h4 style="font-size: 1.15rem;">No active reservations</h4>
+              <p style="color: var(--text-muted); margin-bottom: 1rem;">Looking to travel? Find a convenient ride going your way.</p>
+              <a href="index.html" class="btn btn-primary btn-sm"><i class="fa-solid fa-magnifying-glass"></i> Search Rides</a>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = bookings.map(b => `
+          <div class="ride-card">
+            <div>
+              <div class="ride-header">
+                <span class="seat-tag available"><i class="fa-solid fa-circle-check"></i> ${b.status || 'Confirmed'}</span>
+                <div class="ride-price-badge">
+                  <span class="amount">₹${b.totalPrice}</span>
+                  <span class="unit">Total Paid</span>
+                </div>
+              </div>
+
+              <div class="route-container">
+                <div class="route-stop">
+                  <div class="route-stop-title">Origin</div>
+                  <div class="route-stop-city">${b.rideDetails?.fromCity || 'Pickup Hub'}</div>
+                </div>
+                <div class="route-stop destination">
+                  <div class="route-stop-title">Destination</div>
+                  <div class="route-stop-city">${b.rideDetails?.toCity || 'Arrival Hub'}</div>
+                </div>
+              </div>
+
+              <div class="ride-meta-grid">
+                <div class="meta-item"><i class="fa-regular fa-calendar"></i><span>${b.rideDetails?.date || 'N/A'}</span></div>
+                <div class="meta-item"><i class="fa-regular fa-clock"></i><span>${b.rideDetails?.time || 'N/A'}</span></div>
+                <div class="meta-item"><i class="fa-solid fa-user"></i><span>${b.passengerName || '—'}</span></div>
+                <div class="meta-item"><i class="fa-solid fa-venus-mars"></i><span>${b.passengerGender || '—'}</span></div>
+              </div>
+
+              <!-- Passenger contact info -->
+              <div style="background:var(--bg-main);border-radius:var(--radius-md);padding:0.65rem 0.85rem;margin-top:0.5rem;font-size:0.83rem;display:flex;gap:1.5rem;flex-wrap:wrap;">
+                ${b.passengerPhone ? `<span><i class="fa-solid fa-phone" style="color:var(--primary);"></i> ${b.passengerPhone}</span>` : ''}
+                <span><i class="fa-solid fa-id-card" style="color:var(--primary);"></i> Driver: <strong>${b.rideDetails?.driverName || 'Driver'}</strong></span>
+                <span><i class="fa-solid fa-chair" style="color:var(--primary);"></i> ${b.seatsBooked} Seat(s) Reserved</span>
+              </div>
+            </div>
+
+            <div style="border-top:1px solid var(--border);padding-top:0.6rem;margin-top:0.75rem;font-size:0.8rem;color:var(--text-muted);">
+              Booked on ${b.bookedAt ? new Date(b.bookedAt).toLocaleDateString('en-IN') : 'N/A'}
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        container.innerHTML = `<p style="color: var(--danger);">Failed to load bookings: ${err.message}</p>`;
+      }
+    }
+
+    // Profile update form submission
+    document.getElementById('profile-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const updatedName = document.getElementById('profile-name').value.trim();
+      const updatedPhone = document.getElementById('profile-phone').value.trim();
+      const btn = document.getElementById('save-profile-btn');
+
+      try {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+        await window.RideConnect.updateProfile(activeUser.uid, {
+          name: updatedName,
+          phone: updatedPhone
+        });
+        window.showToast("Profile updated successfully!", "success");
+        initProfile();
+      } catch (err) {
+        window.showToast("Failed to update profile: " + err.message, "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Profile';
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', initProfile);
+  </script>
+</body>
+</html>

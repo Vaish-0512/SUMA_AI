@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RideConnect | Simple, Cloud-Based Ride Sharing</title>
+  <!-- Google Fonts: Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo">
+        <i class="fa-solid fa-car-side"></i>
+        <span>RideConnect</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link active">Find a Ride</a></li>
+        <li><a href="#post-ride-section" id="nav-post-ride-link" class="nav-link">Post a Ride</a></li>
+        <li><a href="profile.html" class="nav-link">My Rides & Profile</a></li>
+      </ul>
+
+      <div class="nav-auth" id="nav-auth-container">
+        <!-- Dynamically injected by app.js -->
+        <a href="login.html" class="btn btn-outline btn-sm">Log In</a>
+        <a href="register.html" class="btn btn-primary btn-sm">Register</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero-section">
+    <div class="container hero-content">
+      <div class="hero-badge">
+        <i class="fa-solid fa-bolt"></i> Cloud-Powered Carpooling Made Simple
+      </div>
+      <h1 class="hero-title">Share the Ride, Split the Cost</h1>
+      <p class="hero-subtitle">Connect with drivers and passengers heading your way. Eco-friendly, economical, and seamless booking with Firebase.</p>
+    </div>
+  </header>
+
+  <!-- Search Section -->
+  <section class="container">
+    <div class="search-card">
+      <form id="search-form" class="search-grid">
+        <div class="form-group">
+          <label for="search-from"><i class="fa-solid fa-location-dot"></i> From</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-circle-dot"></i>
+            <input type="text" id="search-from" class="form-control" placeholder="Departure city or hub">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="search-to"><i class="fa-solid fa-location-crosshairs"></i> Destination</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-location-arrow"></i>
+            <input type="text" id="search-to" class="form-control" placeholder="Arrival city or landmark">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="search-date"><i class="fa-solid fa-calendar-day"></i> Travel Date</label>
+          <input type="date" id="search-date" class="form-control no-icon">
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="height: 48px;">
+          <i class="fa-solid fa-magnifying-glass"></i> Search Rides
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Main Rides Section -->
+  <main class="container rides-section">
+    <div class="rides-filter-bar">
+      <div>
+        <h2 class="section-title" id="rides-heading">Available Rides</h2>
+        <p class="section-subtitle" id="rides-count-text">Showing latest active departures</p>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem;">
+        <button id="reset-search-btn" class="btn btn-outline btn-sm" style="display: none;">
+          <i class="fa-solid fa-rotate-left"></i> Reset Filter
+        </button>
+        <button id="quick-post-btn" class="btn btn-accent btn-sm">
+          <i class="fa-solid fa-plus-circle"></i> Offer a Ride
+        </button>
+      </div>
+    </div>
+
+    <!-- Rides Grid Container -->
+    <div id="rides-container" class="rides-grid">
+      <!-- Dynamically filled with modern ride cards -->
+    </div>
+  </main>
+
+  <!-- Features Highlight -->
+  <section class="features-section" style="background: #ffffff; border-top: 1px solid var(--border);">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Why Choose RideConnect?</h2>
+        <p class="section-subtitle">A modern, secure and reliable carpooling experience</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-box">
+          <div class="feature-icon-wrapper">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem;">Verified Profiles</h3>
+          <p style="color: var(--text-muted); font-size: 0.95rem;">Every driver and passenger profile is protected with Firebase secure authentication.</p>
+        </div>
+
+        <div class="feature-box">
+          <div class="feature-icon-wrapper">
+            <i class="fa-solid fa-wallet"></i>
+          </div>
+          <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem;">Pocket-Friendly</h3>
+          <p style="color: var(--text-muted); font-size: 0.95rem;">Share gas and toll costs with co-travelers and drastically cut your commuting expenses.</p>
+        </div>
+
+        <div class="feature-box">
+          <div class="feature-icon-wrapper">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+          </div>
+          <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem;">Real-Time Cloud Sync</h3>
+          <p style="color: var(--text-muted); font-size: 0.95rem;">Rides and bookings sync immediately across all devices powered by Google Cloud Firestore.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Booking Confirmation Modal -->
+  <div id="booking-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width:560px;">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-ticket" style="color: var(--primary);"></i> Reserve Your Seat</h3>
+        <button id="close-booking-modal" class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="booking-ride-summary" style="margin-bottom: 1.25rem;"></div>
+
+        <!-- Seat Availability Panel -->
+        <div id="seat-availability-panel" style="margin-bottom: 1.25rem; padding: 1rem; background: var(--bg-main); border-radius: var(--radius-md); border: 1px solid var(--border);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+            <span style="font-weight:700; font-size:0.95rem; color:var(--text-main);"><i class="fa-solid fa-chair" style="color:var(--primary);"></i> Seat Status</span>
+            <span id="seat-status-badge" class="seat-tag available"></span>
+          </div>
+          <!-- Booked passengers list -->
+          <div id="booked-passengers-list" style="font-size:0.82rem;"></div>
+        </div>
+
+        <form id="booking-form">
+          <input type="hidden" id="modal-ride-id">
+
+          <!-- Passenger Info -->
+          <p style="font-size:0.82rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted); margin-bottom:0.75rem;">Your Details</p>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:0.85rem;">
+            <div class="form-group">
+              <label for="passenger-name"><i class="fa-solid fa-user"></i> Full Name</label>
+              <input type="text" id="passenger-name" class="form-control no-icon" placeholder="Arjun Sharma" required>
+            </div>
+            <div class="form-group">
+              <label for="passenger-phone"><i class="fa-solid fa-phone"></i> Phone Number</label>
+              <input type="tel" id="passenger-phone" class="form-control no-icon" placeholder="9876543210" required>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1rem;">
+            <div class="form-group">
+              <label for="passenger-gender"><i class="fa-solid fa-venus-mars"></i> Gender</label>
+              <select id="passenger-gender" class="form-control no-icon" required>
+                <option value="">Select...</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="seats-to-book"><i class="fa-solid fa-users"></i> No. of Seats</label>
+              <input type="number" id="seats-to-book" class="form-control no-icon" value="1" min="1" max="6" required>
+            </div>
+          </div>
+
+          <div style="background: var(--primary-light); padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; font-weight: 600; color: var(--primary);">
+              <span>Estimated Total:</span>
+              <span id="booking-total-price">₹0</span>
+            </div>
+          </div>
+
+          <button type="submit" id="confirm-booking-btn" class="btn btn-primary btn-block">
+            <i class="fa-solid fa-check"></i> Confirm Reservation
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Post a Ride Modal -->
+  <div id="post-ride-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-route" style="color: var(--primary);"></i> Offer a Ride</h3>
+        <button id="close-post-modal" class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="post-ride-form">
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label for="post-from"><i class="fa-solid fa-circle-dot"></i> Starting Location</label>
+            <input type="text" id="post-from" class="form-control no-icon" placeholder="e.g. San Francisco" required>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label for="post-to"><i class="fa-solid fa-location-arrow"></i> Destination</label>
+            <input type="text" id="post-to" class="form-control no-icon" placeholder="e.g. San Jose" required>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+            <div class="form-group">
+              <label for="post-date"><i class="fa-solid fa-calendar"></i> Date</label>
+              <input type="date" id="post-date" class="form-control no-icon" required>
+            </div>
+            <div class="form-group">
+              <label for="post-time"><i class="fa-solid fa-clock"></i> Time</label>
+              <input type="time" id="post-time" class="form-control no-icon" required>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+            <div class="form-group">
+              <label for="post-seats"><i class="fa-solid fa-chair"></i> Available Seats</label>
+              <input type="number" id="post-seats" class="form-control no-icon" min="1" max="8" value="3" required>
+            </div>
+            <div class="form-group">
+              <label for="post-price"><i class="fa-solid fa-indian-rupee-sign"></i> Price per Seat (₹)</label>
+              <input type="number" id="post-price" class="form-control no-icon" min="1" max="5000" value="300" required>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+            <div class="form-group">
+              <label for="post-vehicle-type"><i class="fa-solid fa-tag"></i> Vehicle Type</label>
+              <select id="post-vehicle-type" class="form-control no-icon" required>
+                <option value="">Select type...</option>
+                <option value="Hatchback">🚗 Hatchback</option>
+                <option value="Sedan">🚙 Sedan</option>
+                <option value="SUV">🚕 SUV</option>
+                <option value="MPV">🚐 MPV</option>
+                <option value="Auto">🛺 Auto</option>
+                <option value="Bike">🏍️ Bike</option>
+                <option value="Bus">🚌 Bus</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="post-car"><i class="fa-solid fa-car"></i> Vehicle Name</label>
+              <input type="text" id="post-car" class="form-control no-icon" placeholder="e.g. Tata Nexon">
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label for="post-notes"><i class="fa-solid fa-comment-dots"></i> Additional Notes / Vehicle</label>
+            <textarea id="post-notes" class="form-control no-icon" rows="2" placeholder="e.g. Clean sedan, non-smoking, large trunk"></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block">
+            <i class="fa-solid fa-paper-plane"></i> Publish Ride
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="brand-logo" style="font-size: 1.25rem;">
+        <i class="fa-solid fa-car-side"></i>
+        <span>RideConnect</span>
+      </div>
+      <div>
+        <span>Cloud-Connected Ride Sharing Platform &bull; Built with Firebase</span>
+      </div>
+    </div>
+    <div class="container footer-copy">
+      &copy; 2026 RideConnect. All rights reserved.
+    </div>
+  </footer>
+
+  <!-- Firebase Scripts (compat version for easy vanilla JS setup) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <!-- App Scripts -->
+  <script src="js/firebase-config.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    let currentSelectedRide = null;
+
+    // Load and Render Rides
+    async function loadRides(filters = {}) {
+      const container = document.getElementById('rides-container');
+      container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 3rem;"><i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; color: var(--primary);"></i><p style="margin-top: 0.5rem; color: var(--text-muted);">Finding journeys...</p></div>';
+
+      try {
+        const rides = await window.RideConnect.getRides(filters);
+        const countText = document.getElementById('rides-count-text');
+        countText.textContent = `${rides.length} journey${rides.length === 1 ? '' : 's'} available`;
+
+        if (rides.length === 0) {
+          container.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 4rem 1rem; background: white; border-radius: var(--radius-lg); border: 1px dashed var(--border);">
+              <i class="fa-solid fa-car-tunnel" style="font-size: 3rem; color: var(--text-light); margin-bottom: 1rem;"></i>
+              <h3 style="font-size: 1.25rem;">No rides found</h3>
+              <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Try adjusting your search criteria or be the first to offer a ride!</p>
+              <button onclick="document.getElementById('quick-post-btn').click()" class="btn btn-primary btn-sm">Post This Route</button>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = rides.map(ride => `
+          <div class="ride-card">
+            <div>
+              <div class="ride-header">
+                <div class="driver-info">
+                  <div class="driver-avatar">${(ride.driverName || 'D')[0].toUpperCase()}</div>
+                  <div class="driver-details">
+                    <h4>${ride.driverName || 'Verified Driver'}</h4>
+                    <span><i class="fa-solid fa-star" style="color: #f59e0b;"></i> 4.9 &bull; Driver</span>
+                  </div>
+                </div>
+                <div class="ride-price-badge">
+                  <span class="amount">₹${ride.price}</span>
+                  <span class="unit">per passenger</span>
+                </div>
+              </div>
+
+              <div class="route-container">
+                <div class="route-stop">
+                  <div class="route-stop-title">Departure</div>
+                  <div class="route-stop-city">${ride.fromCity}</div>
+                </div>
+                <div class="route-stop destination">
+                  <div class="route-stop-title">Arrival</div>
+                  <div class="route-stop-city">${ride.toCity}</div>
+                </div>
+              </div>
+
+              <div class="ride-meta-grid">
+                <div class="meta-item">
+                  <i class="fa-regular fa-calendar"></i>
+                  <span>${ride.date}</span>
+                </div>
+                <div class="meta-item">
+                  <i class="fa-regular fa-clock"></i>
+                  <span>${ride.time}</span>
+                </div>
+                ${ride.car ? `<div class="meta-item">
+                  <i class="fa-solid fa-car"></i>
+                  <span>${ride.car}</span>
+                </div>` : ''}
+                ${ride.vehicleType ? `<div class="meta-item">
+                  <i class="fa-solid fa-tag"></i>
+                  <span style="background:var(--primary-light);color:var(--primary);padding:1px 8px;border-radius:20px;font-size:0.78rem;font-weight:600;">${ride.vehicleType}</span>
+                </div>` : ''}
+              </div>
+
+              ${ride.notes ? `<p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; font-style: italic;"><i class="fa-solid fa-quote-left" style="color: var(--primary-light);"></i> ${ride.notes}</p>` : ''}
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 1rem;">
+              <span class="seat-tag ${ride.seatsAvailable > 0 ? 'available' : 'full'}">
+                <i class="fa-solid fa-user-check"></i> ${ride.seatsAvailable} seat${ride.seatsAvailable === 1 ? '' : 's'} left
+              </span>
+              <button onclick="openBookingModal('${ride.id}')" class="btn btn-primary btn-sm" ${ride.seatsAvailable <= 0 ? 'disabled' : ''}>
+                ${ride.seatsAvailable > 0 ? '<i class="fa-solid fa-ticket"></i> Book Seat' : 'Fully Booked'}
+              </button>
+            </div>
+          </div>
+        `).join('');
+
+      } catch (err) {
+        console.error(err);
+        container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--danger); padding: 2rem;">Error loading rides: ${err.message}</div>`;
+      }
+    }
+
+    // Booking Modal logic
+    window.openBookingModal = async function(rideId) {
+      const user = await window.RideConnect.getCurrentUser();
+      if (!user) {
+        window.showToast("Please log in to book a seat.", "info");
+        setTimeout(() => window.location.href = 'login.html', 800);
+        return;
+      }
+
+      const rides = await window.RideConnect.getRides();
+      currentSelectedRide = rides.find(r => r.id === rideId);
+      if (!currentSelectedRide) return;
+
+      const ride = currentSelectedRide;
+      document.getElementById('modal-ride-id').value = rideId;
+      const seatsInput = document.getElementById('seats-to-book');
+      seatsInput.max = ride.seatsAvailable;
+      seatsInput.value = 1;
+
+      // Pre-fill passenger name from logged-in user
+      const nameField = document.getElementById('passenger-name');
+      if (user.name) nameField.value = user.name;
+
+      // Ride summary
+      const summary = document.getElementById('booking-ride-summary');
+      summary.innerHTML = `
+        <div style="background: var(--bg-main); padding: 1rem; border-radius: var(--radius-md);">
+          <div style="font-weight: 700; color: var(--text-main); font-size: 1.05rem;">
+            ${ride.fromCity} &rarr; ${ride.toCity}
+          </div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.35rem;">
+            <i class="fa-regular fa-calendar"></i> ${ride.date} at ${ride.time} &bull; Driver: ${ride.driverName}
+            ${ride.car ? ` &bull; <i class="fa-solid fa-car"></i> ${ride.car}` : ''}
+          </div>
+        </div>
+      `;
+
+      // Seat status badge
+      const badge = document.getElementById('seat-status-badge');
+      const avail = ride.seatsAvailable || 0;
+      const total = ride.seatsTotal || (ride.seats || 0);
+      badge.className = `seat-tag ${avail > 0 ? 'available' : 'full'}`;
+      badge.innerHTML = `<i class="fa-solid fa-chair"></i> ${avail} / ${total} seats free`;
+
+      // Booked passengers list
+      const pList = document.getElementById('booked-passengers-list');
+      let bookedPassengers = [];
+      if (window.RideConnect.isFirebaseLive()) {
+        try {
+          const snap = await window.db.collection('bookings').where('rideId', '==', rideId).get();
+          bookedPassengers = snap.docs.map(d => d.data());
+        } catch(e) {}
+      }
+
+      if (bookedPassengers.length > 0) {
+        pList.innerHTML = `
+          <div style="color:var(--text-muted); font-weight:600; margin-bottom:0.5rem; font-size:0.78rem; text-transform:uppercase; letter-spacing:0.04em;">Already Booked</div>
+          ${bookedPassengers.map(b => `
+            <div style="display:flex; align-items:center; gap:0.5rem; padding:0.4rem 0; border-bottom:1px solid var(--border);">
+              <div style="width:28px;height:28px;border-radius:50%;background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.78rem;">${(b.passengerName||'?')[0].toUpperCase()}</div>
+              <div>
+                <div style="font-weight:600;color:var(--text-main);">${b.passengerName || 'Passenger'} ${b.passengerGender ? '<span style="color:var(--text-muted);font-weight:400;">('+b.passengerGender+')</span>' : ''}</div>
+                <div style="color:var(--text-muted);font-size:0.75rem;">${b.seatsBooked} seat${b.seatsBooked > 1 ? 's' : ''} booked</div>
+              </div>
+            </div>
+          `).join('')}
+        `;
+      } else {
+        pList.innerHTML = `<div style="color:var(--text-muted); font-size:0.8rem;"><i class="fa-solid fa-circle-info"></i> No bookings yet — be the first!</div>`;
+      }
+
+      updateModalTotal();
+      document.getElementById('booking-modal').classList.add('active');
+    };
+
+    function updateModalTotal() {
+      if (!currentSelectedRide) return;
+      const seats = parseInt(document.getElementById('seats-to-book').value, 10) || 1;
+      const total = seats * (currentSelectedRide.price || 0);
+      document.getElementById('booking-total-price').textContent = `₹${total}`;
+    }
+
+    document.getElementById('seats-to-book').addEventListener('input', updateModalTotal);
+
+    document.getElementById('close-booking-modal').addEventListener('click', () => {
+      document.getElementById('booking-modal').classList.remove('active');
+    });
+
+    document.getElementById('booking-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const user = await window.RideConnect.getCurrentUser();
+      const rideId = document.getElementById('modal-ride-id').value;
+      const seats = parseInt(document.getElementById('seats-to-book').value, 10);
+      const passengerName   = document.getElementById('passenger-name').value.trim();
+      const passengerPhone  = document.getElementById('passenger-phone').value.trim();
+      const passengerGender = document.getElementById('passenger-gender').value;
+
+      // Merge passenger info into user object for bookRide
+      const enrichedUser = { ...user, name: passengerName, phone: passengerPhone, gender: passengerGender };
+
+      try {
+        await window.RideConnect.bookRide(rideId, enrichedUser, seats);
+        window.showToast(`Booking confirmed for ${passengerName}! Check your profile.`, "success");
+        document.getElementById('booking-modal').classList.remove('active');
+        document.getElementById('booking-form').reset();
+        loadRides();
+      } catch (err) {
+        window.showToast(err.message, "error");
+      }
+    });
+
+    // Offer a Ride Modal logic
+    function openPostModal() {
+      window.RideConnect.getCurrentUser().then(user => {
+        if (!user) {
+          window.showToast("Please log in to offer a ride.", "info");
+          setTimeout(() => window.location.href = 'login.html', 800);
+          return;
+        }
+        document.getElementById('post-ride-modal').classList.add('active');
+      });
+    }
+
+    document.getElementById('quick-post-btn').addEventListener('click', openPostModal);
+    document.getElementById('nav-post-ride-link').addEventListener('click', (e) => {
+      e.preventDefault();
+      openPostModal();
+    });
+    document.getElementById('close-post-modal').addEventListener('click', () => {
+      document.getElementById('post-ride-modal').classList.remove('active');
+    });
+
+    document.getElementById('post-ride-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const user = await window.RideConnect.getCurrentUser();
+      if (!user) return;
+
+      const rideData = {
+        driverId: user.uid,
+        driverName: user.name || user.email.split('@')[0],
+        fromCity: document.getElementById('post-from').value.trim(),
+        toCity: document.getElementById('post-to').value.trim(),
+        date: document.getElementById('post-date').value,
+        time: document.getElementById('post-time').value,
+        seatsTotal: parseInt(document.getElementById('post-seats').value, 10),
+        price: parseFloat(document.getElementById('post-price').value),
+        vehicleType: document.getElementById('post-vehicle-type').value,
+        car: document.getElementById('post-car').value.trim(),
+        notes: document.getElementById('post-notes').value.trim()
+      };
+
+      try {
+        await window.RideConnect.postRide(rideData);
+        window.showToast("Ride posted successfully!", "success");
+        document.getElementById('post-ride-form').reset();
+        document.getElementById('post-ride-modal').classList.remove('active');
+        loadRides();
+      } catch (err) {
+        window.showToast("Error posting ride: " + err.message, "error");
+      }
+    });
+
+    // Search Form Handler
+    document.getElementById('search-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const from = document.getElementById('search-from').value;
+      const to = document.getElementById('search-to').value;
+      const date = document.getElementById('search-date').value;
+
+      loadRides({ from, to, date });
+      document.getElementById('reset-search-btn').style.display = 'inline-flex';
+    });
+
+    document.getElementById('reset-search-btn').addEventListener('click', () => {
+      document.getElementById('search-form').reset();
+      document.getElementById('reset-search-btn').style.display = 'none';
+      loadRides();
+    });
+
+    // Initialize Page
+    document.addEventListener('DOMContentLoaded', () => {
+      window.updateNavAuth();
+      // Set default min date on inputs
+      const today = new Date().toISOString().split('T')[0];
+      const postDateInput = document.getElementById('post-date');
+      if (postDateInput) postDateInput.min = today;
+      loadRides();
+    });
+  </script>
+</body>
+</html>

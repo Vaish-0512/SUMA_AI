@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RideConnect - Data Simulator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: #08090f;
+      color: #e2e8f0;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    /* ── Header ── */
+    .header { text-align: center; margin-bottom: 2rem; }
+    .header h1 {
+      font-size: 2.2rem; font-weight: 700;
+      background: linear-gradient(90deg, #818cf8, #34d399, #38bdf8);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+    }
+    .header p { color: #475569; margin-top: 0.4rem; font-size: 0.95rem; }
+
+    /* ── Controls ── */
+    .controls {
+      display: flex; justify-content: center; align-items: center;
+      gap: 0.75rem; flex-wrap: wrap; margin-bottom: 2rem;
+      background: #0f1120; border: 1px solid #1e2340;
+      border-radius: 16px; padding: 1rem 1.5rem;
+    }
+    .btn {
+      padding: 0.6rem 1.35rem; border-radius: 10px; font-family: inherit;
+      font-size: 0.9rem; font-weight: 600; border: none; cursor: pointer;
+      transition: all 0.18s; letter-spacing: 0.01em;
+    }
+    .btn-start  { background: linear-gradient(135deg,#22c55e,#16a34a); color:#fff; box-shadow:0 2px 12px rgba(34,197,94,0.3); }
+    .btn-start:hover  { transform:translateY(-1px); box-shadow:0 4px 16px rgba(34,197,94,0.45); }
+    .btn-stop   { background: linear-gradient(135deg,#ef4444,#dc2626); color:#fff; box-shadow:0 2px 12px rgba(239,68,68,0.3); }
+    .btn-stop:hover   { transform:translateY(-1px); box-shadow:0 4px 16px rgba(239,68,68,0.45); }
+    .btn-once   { background: linear-gradient(135deg,#818cf8,#6366f1); color:#fff; box-shadow:0 2px 12px rgba(129,140,248,0.3); }
+    .btn-once:hover   { transform:translateY(-1px); box-shadow:0 4px 16px rgba(129,140,248,0.45); }
+    .btn-clear  { background: linear-gradient(135deg,#f59e0b,#d97706); color:#fff; box-shadow:0 2px 12px rgba(245,158,11,0.25); }
+    .btn-clear:hover  { transform:translateY(-1px); }
+
+    label { color: #64748b; font-size: 0.85rem; display:flex; align-items:center; gap:0.4rem; }
+    select {
+      background: #1a1e30; border: 1px solid #2a2f4a; color: #cbd5e1;
+      padding: 0.45rem 0.75rem; border-radius: 8px; font-family: inherit; font-size: 0.88rem;
+      outline: none; cursor: pointer;
+    }
+    select:focus { border-color: #6366f1; }
+
+    .divider { width: 1px; height: 24px; background: #1e2340; }
+
+    /* ── Status Dot ── */
+    .status-wrap { display:flex; align-items:center; gap:0.4rem; font-size:0.88rem; color:#64748b; }
+    .status-dot {
+      width: 9px; height: 9px; border-radius: 50%; background: #ef4444;
+      box-shadow: 0 0 0 2px rgba(239,68,68,0.2);
+    }
+    .status-dot.active {
+      background: #22c55e;
+      box-shadow: 0 0 0 2px rgba(34,197,94,0.2);
+      animation: pulse 1.2s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1;box-shadow:0 0 0 2px rgba(34,197,94,0.2);} 50%{opacity:0.6;box-shadow:0 0 0 5px rgba(34,197,94,0.05);} }
+
+    /* ── Stats ── */
+    .stats-bar {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem; margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: #0f1120; border: 1px solid #1e2340;
+      border-radius: 14px; padding: 1rem 1.25rem; text-align: center;
+      transition: border-color 0.2s;
+    }
+    .stat-card:hover { border-color: #6366f1; }
+    .stat-card .value { font-size: 2rem; font-weight: 700; line-height: 1; }
+    .stat-card:nth-child(1) .value { color: #818cf8; }
+    .stat-card:nth-child(2) .value { color: #34d399; }
+    .stat-card:nth-child(3) .value { color: #f87171; }
+    .stat-card:nth-child(4) .value { color: #38bdf8; }
+    .stat-card .label { font-size: 0.78rem; color: #475569; margin-top: 0.3rem; letter-spacing:0.04em; text-transform:uppercase; }
+
+    /* ── Log Box ── */
+    .log-header {
+      display:flex; justify-content:space-between; align-items:center;
+      margin-bottom:0.75rem; padding: 0 0.25rem;
+    }
+    .log-header span { font-size:0.85rem; color:#475569; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; }
+
+    .log-box {
+      background: #0b0d18; border: 1px solid #1a1e30;
+      border-radius: 14px; padding: 1rem; height: 380px; overflow-y: auto; font-size: 0.83rem;
+    }
+    .log-box::-webkit-scrollbar { width:5px; }
+    .log-box::-webkit-scrollbar-track { background: transparent; }
+    .log-box::-webkit-scrollbar-thumb { background: #1e2340; border-radius: 10px; }
+
+    .log-entry {
+      padding: 0.5rem 0.75rem; border-radius: 9px; margin-bottom: 0.4rem;
+      display: flex; align-items: flex-start; gap: 0.65rem;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; } }
+    .log-entry.success { background: rgba(52,211,153,0.07); border-left: 3px solid #34d399; }
+    .log-entry.error   { background: rgba(248,113,113,0.07); border-left: 3px solid #f87171; }
+    .log-entry.info    { background: rgba(129,140,248,0.07); border-left: 3px solid #818cf8; }
+    .log-time { color: #334155; font-size: 0.72rem; white-space: nowrap; padding-top: 1px; font-family: monospace; }
+    .log-text { color: #cbd5e1; line-height: 1.5; }
+    .log-text b { color: #e2e8f0; }
+    .vehicle-pill {
+      display:inline-block; padding:1px 7px; border-radius:20px; font-size:0.72rem;
+      font-weight:600; margin-left:4px; vertical-align:middle;
+    }
+    .pill-hatchback { background:rgba(129,140,248,0.15); color:#818cf8; }
+    .pill-sedan     { background:rgba(56,189,248,0.15); color:#38bdf8; }
+    .pill-suv       { background:rgba(52,211,153,0.15); color:#34d399; }
+    .pill-mpv       { background:rgba(245,158,11,0.15); color:#fbbf24; }
+    .pill-auto      { background:rgba(251,191,36,0.12); color:#fb923c; }
+    .pill-bike      { background:rgba(239,68,68,0.12); color:#f87171; }
+    .pill-bus       { background:rgba(167,139,250,0.15); color:#a78bfa; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🚗 RideConnect — Data Simulator</h1>
+  <p>Auto-generates realistic Indian ride data into Firebase Firestore</p>
+</div>
+
+<div class="controls">
+  <div class="status-wrap">
+    <span class="status-dot" id="status-dot"></span>
+    <span id="status-text">Stopped</span>
+  </div>
+  <div class="divider"></div>
+  <button class="btn btn-once"  onclick="pushOneRide()">➕ Add 1 Ride</button>
+  <button class="btn btn-start" onclick="startSim()">▶ Start Auto</button>
+  <button class="btn btn-stop"  onclick="stopSim()">⏹ Stop</button>
+  <button class="btn btn-clear" onclick="clearLog()">🗑 Clear Log</button>
+  <div class="divider"></div>
+  <label>Interval
+    <select id="interval-select">
+      <option value="3000">Every 3s</option>
+      <option value="5000" selected>Every 5s</option>
+      <option value="10000">Every 10s</option>
+      <option value="15000">Every 15s</option>
+    </select>
+  </label>
+</div>
+
+<div class="stats-bar">
+  <div class="stat-card"><div class="value" id="cnt-total">0</div><div class="label">Rides Added</div></div>
+  <div class="stat-card"><div class="value" id="cnt-success">0</div><div class="label">Success</div></div>
+  <div class="stat-card"><div class="value" id="cnt-error">0</div><div class="label">Errors</div></div>
+  <div class="stat-card"><div class="value" id="cnt-session">0</div><div class="label">This Session</div></div>
+</div>
+
+<div class="log-header">
+  <span>📋 Live Feed</span>
+  <span id="feed-count">0 entries</span>
+</div>
+<div class="log-box" id="log-box">
+  <div class="log-entry info">
+    <span class="log-time">--:--:--</span>
+    <span class="log-text">Simulator ready. Click "Add 1 Ride" or "Start Auto" to begin.</span>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+
+<script>
+  // ── Data ────────────────────────────────────────────────────────────────
+  const CITIES = [
+    'Mumbai','Delhi','Bengaluru','Chennai','Kolkata',
+    'Hyderabad','Pune','Ahmedabad','Jaipur','Lucknow',
+    'Surat','Nagpur','Indore','Bhopal','Coimbatore',
+    'Kochi','Visakhapatnam','Vadodara','Agra','Nashik',
+    'Chandigarh','Patna','Mysuru','Ranchi','Guwahati'
+  ];
+  const NAMES = [
+    'Arjun Sharma','Priya Patel','Ravi Kumar','Sneha Iyer',
+    'Aakash Mehta','Divya Nair','Vikram Singh','Kavya Reddy',
+    'Suresh Rao','Ananya Gupta','Manish Joshi','Pooja Verma',
+    'Rohit Das','Lakshmi Krishnan','Karan Malhotra','Swati Bhatt',
+    'Nikhil Jain','Meera Pillai','Aditya Thakur','Sanya Kapoor',
+    'Gaurav Tiwari','Nisha Yadav','Rahul Mishra','Anjali Desai',
+    'Deepak Chauhan','Shruti Bose','Vijay Menon','Ritu Soni'
+  ];
+  const NOTES = [
+    'AC car, music allowed 🎵','Non-smoking, pet friendly 🐶',
+    'Will stop for chai ☕','Ladies only, comfortable journey',
+    'Luggage space available 🧳','Please be punctual — early morning ride',
+    'Highway route, fast journey 🏎️','Sharing costs only, no profit',
+    'Brand new car, very comfortable','Experienced driver, 5★ rated'
+  ];
+
+  // Car mapped to vehicle type
+  const VEHICLES = [
+    { car: 'Maruti Swift',     type: 'Hatchback' },
+    { car: 'Hyundai i20',      type: 'Hatchback' },
+    { car: 'Tata Altroz',      type: 'Hatchback' },
+    { car: 'Honda City',       type: 'Sedan'     },
+    { car: 'Maruti Dzire',     type: 'Sedan'     },
+    { car: 'Hyundai Verna',    type: 'Sedan'     },
+    { car: 'Tata Nexon',       type: 'SUV'       },
+    { car: 'Hyundai Creta',    type: 'SUV'       },
+    { car: 'Kia Seltos',       type: 'SUV'       },
+    { car: 'Mahindra XUV700',  type: 'SUV'       },
+    { car: 'Renault Duster',   type: 'SUV'       },
+    { car: 'Toyota Innova',    type: 'MPV'       },
+    { car: 'Maruti Ertiga',    type: 'MPV'       },
+    { car: 'Kia Carens',       type: 'MPV'       },
+    { car: 'Bajaj Auto',       type: 'Auto'      },
+    { car: 'Royal Enfield',    type: 'Bike'      },
+    { car: 'KSRTC Bus',        type: 'Bus'       },
+    { car: 'MSRTC Volvo',      type: 'Bus'       },
+    { car: 'TNSTC Bus',        type: 'Bus'       },
+  ];
+
+  const PILL_CLASS = {
+    Hatchback: 'pill-hatchback', Sedan: 'pill-sedan',
+    SUV: 'pill-suv', MPV: 'pill-mpv', Auto: 'pill-auto',
+    Bike: 'pill-bike', Bus: 'pill-bus'
+  };
+
+  // ── Helpers ──────────────────────────────────────────────────────────────
+  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+  function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+  function futureDate() {
+    const d = new Date(); d.setDate(d.getDate() + rand(1, 30));
+    return d.toISOString().split('T')[0];
+  }
+  function randomTime() {
+    return `${rand(4,22).toString().padStart(2,'0')}:${['00','15','30','45'][rand(0,3)]}`;
+  }
+
+  function generateRide() {
+    let from = pick(CITIES), to;
+    do { to = pick(CITIES); } while (to === from);
+    const driver = pick(NAMES);
+    const vehicle = pick(VEHICLES);
+    return {
+      driverName: driver,
+      driverEmail: driver.toLowerCase().replace(' ', '.') + '@gmail.com',
+      driverPhone: '9' + rand(100000000, 999999999),
+      origin: from, destination: to,
+      date: futureDate(), time: randomTime(),
+      seats: rand(1, 6), seatsBooked: 0,
+      price: rand(200, 2500),
+      car: vehicle.car,
+      vehicleType: vehicle.type,
+      notes: pick(NOTES),
+      createdAt: new Date().toISOString(), bookings: []
+    };
+  }
+
+  // ── Stats ────────────────────────────────────────────────────────────────
+  let total = 0, success = 0, errors = 0, session = 0;
+  function updateStats() {
+    document.getElementById('cnt-total').textContent   = total;
+    document.getElementById('cnt-success').textContent = success;
+    document.getElementById('cnt-error').textContent   = errors;
+    document.getElementById('cnt-session').textContent = session;
+  }
+
+  // ── Log ──────────────────────────────────────────────────────────────────
+  let logCount = 0;
+  function log(msg, type = 'info') {
+    const box = document.getElementById('log-box');
+    const t = new Date().toLocaleTimeString('en-IN');
+    const el = document.createElement('div');
+    el.className = `log-entry ${type}`;
+    el.innerHTML = `<span class="log-time">${t}</span><span class="log-text">${msg}</span>`;
+    box.prepend(el);
+    while (box.children.length > 80) box.removeChild(box.lastChild);
+    logCount++;
+    document.getElementById('feed-count').textContent = `${logCount} entries`;
+  }
+
+  function clearLog() {
+    document.getElementById('log-box').innerHTML = '';
+    logCount = 0;
+    document.getElementById('feed-count').textContent = '0 entries';
+    log('Log cleared.', 'info');
+  }
+
+  // ── Push ─────────────────────────────────────────────────────────────────
+  async function pushOneRide() {
+    if (!window.db) { log('❌ Firebase not ready. Check firebase-config.js and Firestore rules.', 'error'); return; }
+    const ride = generateRide();
+    total++; session++;
+    try {
+      await window.db.collection('rides').add(ride);
+      success++;
+      const pillClass = PILL_CLASS[ride.vehicleType] || '';
+      log(
+        `✅ <b>${ride.origin}</b> → <b>${ride.destination}</b> &nbsp;|&nbsp; ${ride.driverName} &nbsp;|&nbsp; ₹${ride.price} &nbsp;|&nbsp; ${ride.date} ${ride.time} &nbsp;|&nbsp; ${ride.car} <span class="vehicle-pill ${pillClass}">${ride.vehicleType}</span>`,
+        'success'
+      );
+    } catch (e) {
+      errors++;
+      log(`❌ Error: ${e.message}`, 'error');
+    }
+    updateStats();
+  }
+
+  // ── Auto Sim ─────────────────────────────────────────────────────────────
+  let simTimer = null;
+  function startSim() {
+    if (simTimer) return;
+    const interval = parseInt(document.getElementById('interval-select').value);
+    session = 0;
+    log(`▶ Auto-simulator started — pushing every ${interval/1000}s`, 'info');
+    document.getElementById('status-dot').classList.add('active');
+    document.getElementById('status-text').textContent = 'Running';
+    pushOneRide();
+    simTimer = setInterval(pushOneRide, interval);
+  }
+
+  function stopSim() {
+    if (!simTimer) return;
+    clearInterval(simTimer); simTimer = null;
+    document.getElementById('status-dot').classList.remove('active');
+    document.getElementById('status-text').textContent = 'Stopped';
+    log('⏹ Simulator stopped.', 'info');
+  }
+</script>
+</body>
+</html>
